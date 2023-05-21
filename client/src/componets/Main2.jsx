@@ -1,19 +1,32 @@
-import React from 'react'
-import Container from '@mui/material/Container';
-import Box from '@mui/material/Box';
-import { experimentalStyled as styled } from '@mui/material/styles';
-import Paper from '@mui/material/Paper';
-import Grid from '@mui/material/Grid';
-import { Card } from 'antd';
-const { Meta } = Card;
-const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-  ...theme.typography.body2,
-  padding: theme.spacing(2),
-  textAlign: 'center',
-  color: theme.palette.text.secondary,
-}));
+import { BASE_URL } from "../api/base_url";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import { Card, Typography } from "antd";
+export const getAllPeoples = async (name) => {
+  let globalData;
+  let URL;
+  if (!name) {
+    URL = BASE_URL+'/students';
+  }
+  else{
+    URL = BASE_URL+'/students'+`?name=${name}`;
+  }
+  await axios.get(URL).then((res) => {
+    globalData = res.data.data;
+  });
+  return globalData;
+};
+
 const Main2 = () => {
+  const [peoples, setPeoples] = useState([]);
+  useEffect(() => {
+    getAllPeoples().then((res) => {
+      setPeoples(res);
+    });
+  }, []);
   return (
     <>
     <div
@@ -57,28 +70,41 @@ const Main2 = () => {
           Problems trying to resolve the conflict between the two major realms
           of Classical physics: Newtonian mechanics{" "}
         </p>
-       
+        <Box    
+        sx={{ flexGrow: 1, width: "90%", margin: "25px auto" }}
+      >
     
-        <Container maxWidth="sm" style={{marginTop:'50px'}}>
-        <Box sx={{ flexGrow: 1 }}>
-      <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
-        {Array.from(Array(6)).map((_, index) => (
-          <Grid item xs={2} sm={4} md={4} key={index}>
-             <Card
+
+        <Grid container spacing={2}>
+          {peoples &&
+            peoples.map((people) => {
+              return (
+                <Grid key={people._id} item lg={3} md={6} sm={12}>
+                  <Card
+                  >
+                  <Card
     hoverable
     style={{
       width: 240,
     }}
-    cover={<img alt="example" src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png" />}
+    cover={<img alt="example" src="https://assets.website-files.com/634681057b887c6f4830fae2/6367ddcdcaac03478d077305_62c5ecdd62c665518919f68d_Dev%2520Experience.png" />}
   >
-    <Meta title="Europe Street beat" description="www.instagram.com" />
   </Card>
-          </Grid>
-        ))}
-      </Grid>
-    </Box>
+                    <Typography>  Name: {people.name}</Typography>
 
-      </Container>
+                    <Typography>Surname: {people.surname}</Typography>
+                    
+                  
+
+
+                  </Card>
+                </Grid>
+              );
+            })}
+        </Grid>
+      </Box>
+    
+        
       </div>
     </>
   )
